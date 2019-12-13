@@ -1,0 +1,8 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.RoleMapper">
+    <select id="findByRole" parameterType="int" resultType="Role">
+      select r.* from t_user_role u ,t_role r where u.role_id = r.id and u.user_id = #{id}
+    </select>
+</mapper>

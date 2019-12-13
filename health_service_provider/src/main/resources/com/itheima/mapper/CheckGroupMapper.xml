@@ -1,0 +1,106 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.CheckGroupMapper">
+    <select id="findAll" resultType="CheckItem">
+        select * from t_checkitem
+    </select>
+
+
+    <insert id="add" parameterType="CheckGroup">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into `health`.`t_checkgroup` ( `code`, `name`,`helpCode`,`sex`,`remark`,`attention`)
+            values
+        (#{code},#{name},#{helpCode},#{sex},#{remark},#{attention});
+
+    </insert>
+
+
+    <insert id="addcheckitem_id_AND_checkGroup_id" parameterType="hashmap">
+        insert into `health`.`t_checkgroup_checkitem` (`checkgroup_id`, `checkitem_id`)
+            values
+        (#{checkgroup_id}, #{checkitem_id}) ;
+    </insert>
+
+
+
+    <select id="pagefindAll" parameterType="string" resultType="CheckGroup">
+            select * from `t_checkgroup`
+        <where>
+            <if test="value != null and value != '' and value.length > 0">
+                and code = #{value} or name = #{value} or helpCode = #{value}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="findById" parameterType="integer" resultType="CheckGroup">
+        select * from `t_checkgroup` where id = #{id}
+    </select>
+
+    <select id="findId" parameterType="integer" resultType="int">
+       select checkitem_id from `t_checkgroup_checkitem` where checkgroup_id = #{id}
+    </select>
+
+
+    <update id="Edit" parameterType="CheckGroup" >
+        update t_checkgroup
+        <set>
+            <if test="code != null and code != '' and code.length > 0 ">
+                code = #{code},
+            </if>
+            <if test="name != null and name != '' and name.length > 0 ">
+                name = #{name},
+            </if>
+            <if test="helpCode != null and helpCode != '' and helpCode.length > 0 ">
+                helpCode = #{helpCode},
+            </if>
+            <if test="sex != null and sex != '' and sex.length > 0 ">
+                sex = #{sex},
+            </if>
+            <if test="remark != null and remark != '' and remark.length > 0 ">
+                remark = #{remark},
+            </if>
+            <if test="attention != null and attention != '' and attention.length > 0 ">
+                attention = #{attention}
+            </if>
+            where id = #{id}
+        </set>
+    </update>
+
+
+    <delete id="deleteById" parameterType="int" >
+        delete from `health`.`t_checkgroup_checkitem` where `checkgroup_id` = #{id}
+    </delete>
+
+    <delete id="delete" parameterType="int">
+        delete from  `health`.`t_checkgroup` where `id` = #{id} ;
+    </delete>
+
+
+
+    <select id="findByIdResultMap" parameterType="int" resultMap="findByIdResultMap">
+        select *  from `t_checkgroup` where id in ( select checkgroup_id from `t_setmeal_checkgroup` where setmeal_id = #{id})
+    </select>
+
+    <resultMap id="baseResultData" type="CheckGroup">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="helpCode" property="helpCode"/>
+        <result column="sex" property="sex"/>
+        <result column="remark" property="remark"/>
+        <result column="attention" property="attention"/>
+
+    </resultMap>
+        <resultMap id="findByIdResultMap" type="CheckGroup" extends="baseResultData">
+            <collection property="checkItems"
+                        ofType="CheckItem"
+                        column="id"
+                        select="com.itheima.mapper.CheckItemMapper.findByIdResult">
+            </collection>
+        </resultMap>
+
+</mapper>

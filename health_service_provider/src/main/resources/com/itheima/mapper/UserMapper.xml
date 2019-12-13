@@ -1,0 +1,25 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.UserMapper">
+    <select id="findByUsername" parameterType="string" resultType="User">
+        select * from t_user where username = #{username}
+    </select>
+
+    <select id="findRole" parameterType="integer" resultType="com.itheima.pojo.Role">
+        select r.* from`t_user_role` ur,`t_role` r where #{id} = ur.role_id and ur.role_id = r.id
+    </select>
+
+
+    <select id="findMenu" parameterType="integer" resultType="map">
+        select m.id , m.name title,m.linkUrl,m.path,m.icon
+        from `t_role_menu` r ,`t_menu` m
+        where  r.role_id =#{id} and menu_id = m.id and level = 1
+    </select>
+
+    <select id="findPath" parameterType="map" resultType="map">
+select distinct s.name title,s.path,s.icon,s.linkUrl from
+ (select * from `t_role_menu` r ,`t_menu` m where r.role_id = #{rid} and r.menu_id = m.id and icon is null) s,
+ (select * from `t_role_menu` r ,`t_menu` m  where r.role_id = #{rid} and r.menu_id  = m.id and level =1 ) a where #{id} = s.parentMenuId
+    </select>
+</mapper>

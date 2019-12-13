@@ -1,0 +1,71 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.OrderMapper">
+    <!--根据日期查询预约设置信息-->
+    <select id="findByOrderDate" parameterType="date" resultType="OrderSetting">
+        select * from t_ordersetting where orderDate = #{orderDate}
+    </select>
+
+    <insert id="add" parameterType="Order">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into t_order(member_id,orderDate,orderType,orderStatus,setmeal_id)
+        values (#{memberId},#{orderDate},#{orderType},#{orderStatus},#{setmealId})
+    </insert>
+
+
+    <select id="findById" parameterType="int" resultType="map">
+        select m.name member ,s.name setmeal,o.orderDate orderDate,o.orderType orderType from t_order o, t_member m, t_setmeal s where o.member_id=m.id and o.setmeal_id=s.id and o.id=#{id}
+    </select>
+
+    <select id="findBytelephone" parameterType="string" resultType="member" >
+        select * from t_member where phoneNumber = #{phoneNumber}
+    </select>
+
+    <insert id="adds" parameterType="Member">
+    <selectKey resultType="integer" keyProperty="id" order="AFTER">
+        SELECT LAST_INSERT_ID()
+    </selectKey>
+        insert into t_member (fileNumber,name,sex,idCard,phoneNumber,regTime,password,email,birthday,r emark) values (#{fileNumber},#{name},#{sex},#{idCard},#{phoneNumber},#{regTime},# {password},#{email},#{birthday},#{remark})
+    </insert>
+
+
+    <!--查询今日预约数-->
+    <select id="todayOrderNumber" parameterType="string" resultType="integer">
+        select count(*) from `t_order` where orderDate = #{data}
+    </select>
+
+    <!--查询今日到诊-->
+    <select id="todayVisitsNumber" parameterType="string" resultType="integer">
+        select count(*) from `t_order` where orderDate = #{data} and orderStatus = '已到诊'
+    </select>
+    <!--查询本周预约数-->
+    <select id="thisWeekOrderNumber" parameterType="map" resultType="integer">
+        select count(*) from `t_order` where orderDate between #{diyi} and #{zuihou}
+    </select>
+
+    <!--本周到诊数-->
+    <select id="thisWeekVisitsNumber" parameterType="map" resultType="integer">
+        select count(*) from `t_order` where orderDate between #{diyi} and #{zuihou} and orderStatus = '已到诊'
+    </select>
+
+    <!--本月预约数-->
+    <select id="thisMonthOrderNumber" parameterType="map" resultType="integer">
+        select count(*) from `t_order` where orderDate between #{diyi} and #{zuihou}
+    </select>
+    <!--本月到诊数-->
+    <select id="thisMonthVisitsNumber" parameterType="map" resultType="integer">
+        select count(*) from `t_order` where orderDate between #{diyi} and #{zuihou} and orderStatus = '已到诊'
+    </select>
+
+    <select id="hotSetmeal" resultType="map" >
+        select s.name,count(s.id) setmeal_count,count(s.id)/(select count(id) from t_order) proportion
+        from t_order o ,t_setmeal s where o.setmeal_id = s.id group by s.name order by setmeal_count desc limit 2
+    </select>
+
+    <delete id="delet" parameterType="string">
+        delete from  `t_ordersetting` where orderDate &lt;= #{orderdate}
+    </delete>
+</mapper>
